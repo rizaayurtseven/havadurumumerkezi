@@ -1,372 +1,297 @@
-// Tema Değiştirme İşlevselliği
-const themeToggle = document.getElementById('theme-toggle');
-const body = document.body;
-
-document.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-        body.className = savedTheme + '-theme'; // Kayıtlı temayı uygula
-        updateButtonText(savedTheme);
-    } else {
-        // Başlangıçta HTML'deki class neyse onu kontrol et veya light yap
-        let initialTheme = 'light';
-        if (body.classList.contains('dark-theme')) {
-            initialTheme = 'dark';
-        } else if (body.classList.contains('fenerbahce-theme')) {
-             initialTheme = 'fenerbahce';
-        } else {
-           body.classList.add('light-theme'); // Yoksa light ekle
-        }
-        updateButtonText(initialTheme);
-    }
-    // Hava durumu uygulamasını jQuery hazır olduğunda başlat
-    $(document).ready(initializeWeatherApp);
-});
-
-themeToggle.addEventListener('click', () => {
-    let currentTheme = '';
-    if (body.classList.contains('light-theme')) currentTheme = 'light';
-    else if (body.classList.contains('dark-theme')) currentTheme = 'dark';
-    else if (body.classList.contains('fenerbahce-theme')) currentTheme = 'fenerbahce';
-    else currentTheme = 'light'; // Varsayılan
-
-    let nextTheme = '';
-    body.classList.remove('light-theme', 'dark-theme', 'fenerbahce-theme'); // Önce tümünü kaldır
-
-    // Tema döngüsü
-    if (currentTheme === 'light') nextTheme = 'dark';
-    else if (currentTheme === 'dark') nextTheme = 'fenerbahce';
-    else if (currentTheme === 'fenerbahce') nextTheme = 'light';
-    else nextTheme = 'dark'; // Hata durumunda koyuya geç
-
-    body.classList.add(nextTheme + '-theme'); // Yeni temayı ekle
-    updateButtonText(nextTheme);
-    localStorage.setItem('theme', nextTheme); // Seçimi kaydet
-});
-
-function updateButtonText(currentActiveTheme) {
-    // Buton metnini bir sonraki temaya geçişi gösterecek şekilde ayarla
-    if (themeToggle) {
-        if (currentActiveTheme === 'light') themeToggle.textContent = 'ACİK Tema';
-        else if (currentActiveTheme === 'dark') themeToggle.textContent = 'KOYU Tema'; // Fenerbahçe'ye geçiş
-        else if (currentActiveTheme === 'fenerbahce') themeToggle.textContent ='RENKLİ Tema';
-        else themeToggle.textContent = 'Koyu Tema'; // Varsayılan
-    }
-}
-
+// Tema ile ilgili tüm kodlar kaldırıldı.
 
 // Hava Durumu Uygulaması İşlevselliği
 function initializeWeatherApp() {
 
-    const apiKey = '5c03ce0373390aff630bcb6f7aac303b'; // DİKKAT: API Anahtarını burada tutmak güvensizdir!
-    const apiUrlBase = 'https://api.openweathermap.org/data/2.5/weather';
+    const apiKey = '5c03ce0373390aff630bcb6f7aac303b'; // <<< KENDİ API ANAHTARINIZI GİRİN!
+    const forecastApiUrlBase = 'https://api.openweathermap.org/data/2.5/forecast';
+    const currentWeatherApiUrlBase = 'https://api.openweathermap.org/data/2.5/weather';
 
-    // jQuery Element Seçimleri
     const $favoriteCitiesContainer = $('#favorite-cities-container');
-    const $searchResultBox = $('#weather-result');
-    const $searchWeatherContent = $searchResultBox.find('.weather-content');
-    const $searchLoadingSpinner = $searchResultBox.find('.loading-spinner');
-    const $searchErrorMessage = $searchResultBox.find('.error-message');
-    const $addFavoriteBtn = $searchResultBox.find('.add-favorite-btn');
+    const $forecastResultContainer = $('#forecast-result-container');
+    const $forecastCityName = $('#forecast-city-name');
+    const $forecastCardsContainer = $('#forecast-cards-container');
+    const $forecastLoadingSpinner = $('#forecast-loading-spinner');
+    const $forecastErrorMessage = $('#forecast-error-message');
+    const $addFavoriteBtn = $('<button class="btn btn-success btn-sm mt-2" style="display:none;">Favorilere Ekle</button>');
+
     const $cityInput = $('#city-input');
     const $getWeatherBtn = $('#get-weather-btn');
-    const $initialPlaceholderMsg = $favoriteCitiesContainer.find('.placeholder-message');
 
-    // Değişkenler
     let favoriteCities = JSON.parse(localStorage.getItem('favoriteCities')) || [];
-    let currentSearchCity = null; // O an aranan ve sonuç kutusunda gösterilen şehir
-    const MAX_FAVORITES = 5; // Maksimum favori sayısı
+    let currentSearchCityData = null;
+    const MAX_FAVORITES = 5;
 
-    // --- Hava Durumu Verisi Getirme Fonksiyonu ---
-    function getWeatherForCity(city, targetElement) {
-        const $target = $(targetElement); // jQuery nesnesi olmalı
-        const isSearchResult = $target.is('#weather-result'); // Arama kutusu mu? ID ile kontrol
-        const isFavoriteCard = $target.hasClass('weather-card'); // Favori kartı mı? Class ile kontrol
+    function processForecastData(forecastList) {
+        const dailyData = {};
+        forecastList.forEach(item => {
+            const date = item.dt_txt.split(' ')[0];
+            if (!dailyData[date]) {
+                dailyData[date] = {
+                    temps: [], weather: [], icons: [], descriptions: [],
+                    humidity: [], wind_speed: []
+                };
+            }
+            dailyData[date].temps.push(item.main.temp);
+            dailyData[date].weather.push(item.weather[0].main);
+            dailyData[date].icons.push(item.weather[0].icon);
+            dailyData[date].descriptions.push(item.weather[0].description);
+            dailyData[date].humidity.push(item.main.humidity);
+            dailyData[date].wind_speed.push(item.wind.speed);
+        });
 
-        let $loading, $errorMsg, $contentContainer;
+        const processedDailyArray = [];
+        for (const date in dailyData) {
+            const day = dailyData[date];
+            const minTemp = Math.min(...day.temps);
+            const maxTemp = Math.max(...day.temps);
+            const representativeIndex = Math.floor(day.icons.length / 2);
+            const icon = day.icons[representativeIndex];
+            const description = day.descriptions[representativeIndex].charAt(0).toUpperCase() + day.descriptions[representativeIndex].slice(1);
+            const avgHumidity = day.humidity.reduce((a, b) => a + b, 0) / day.humidity.length;
+            const avgWindSpeed = day.wind_speed.reduce((a, b) => a + b, 0) / day.wind_speed.length;
 
-        // Hedefe göre ilgili elementleri belirle
-        if (isSearchResult) {
-            $loading = $searchLoadingSpinner;
-            $errorMsg = $searchErrorMessage;
-            $contentContainer = $searchWeatherContent;
-            currentSearchCity = city; // Arama yapılan şehri sakla
-            $addFavoriteBtn.addClass('d-none'); // Favori butonunu başlangıçta gizle
-        } else if (isFavoriteCard) {
-            $loading = $target.find('.loading-spinner');
-            $errorMsg = $target.find('.error-message');
-            $contentContainer = $target.find('.card-body'); // İçerik favori kartının body'sine eklenecek
-        } else {
-            console.error("Bilinmeyen hedef element:", targetElement);
-            return; // Hatalı hedefse çık
+            processedDailyArray.push({
+                date: new Date(date).toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'short' }),
+                minTemp: Math.round(minTemp), maxTemp: Math.round(maxTemp),
+                icon: icon, description: description,
+                avgHumidity: Math.round(avgHumidity), avgWindSpeed: avgWindSpeed.toFixed(1)
+            });
+        }
+        return processedDailyArray.slice(0, 5);
+    }
+
+    function displayFiveDayForecast(dailyForecasts, cityName) {
+        $forecastCardsContainer.empty();
+        $forecastCityName.text(cityName + " İçin 5 Günlük Tahmin").show();
+
+        if (!dailyForecasts || dailyForecasts.length === 0) {
+            $forecastErrorMessage.text('Günlük tahmin verisi bulunamadı.').show();
+            return;
         }
 
-        // Başlangıç durumu: Yükleniyor göster, hata/içeriği gizle
-        $loading.show();
-        $errorMsg.hide().text('');
-        if (isSearchResult) {
-            $contentContainer.hide(); // Arama kutusu içeriğini gizle
-             $searchResultBox.removeClass('gunesli bulutlu yagmurlu karli diger hata loaded error'); // Önceki durumları temizle
-        } else if (isFavoriteCard) {
-             $target.removeClass('gunesli bulutlu yagmurlu karli diger hata loaded error'); // Önceki durumları temizle
-             $contentContainer.find('.weather-info-loaded').remove(); // Eski favori içeriğini temizle
-        }
+        dailyForecasts.forEach(day => {
+            const iconUrl = `https://openweathermap.org/img/w/${day.icon}.png`;
+            const cardHtml = `
+                <div class="col">
+                    <div class="card h-100 forecast-day-card shadow-sm">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">${day.date}</h5>
+                            <img src="${iconUrl}" alt="${day.description}" class="my-2" style="width: 60px; height: 60px;">
+                            <p class="card-text mb-1"><strong>${day.description}</strong></p>
+                            <p class="card-text h4">${day.maxTemp}° <span class="text-muted">/ ${day.minTemp}°</span></p>
+                            <p class="card-text small text-muted mt-2">Nem: %${day.avgHumidity} | Rüzgar: ${day.avgWindSpeed} m/s</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            $forecastCardsContainer.append(cardHtml);
+        });
 
-        // API İsteği
-        const requestUrl = `${apiUrlBase}?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric&lang=tr`;
+        const isAlreadyFavorite = favoriteCities.some(favCity => favCity.toLowerCase() === cityName.toLowerCase());
+        const isLimitReached = favoriteCities.length >= MAX_FAVORITES;
+
+        $addFavoriteBtn.remove();
+        if (currentSearchCityData && currentSearchCityData.name) {
+            $forecastCityName.after($addFavoriteBtn);
+            if (!isAlreadyFavorite && !isLimitReached) {
+                $addFavoriteBtn.text(`${cityName}'i Favorilere Ekle`).removeClass('disabled').show();
+            } else if (isAlreadyFavorite) {
+                $addFavoriteBtn.text('Zaten Favorilerde').addClass('disabled').show();
+            } else {
+                $addFavoriteBtn.hide();
+            }
+        }
+    }
+
+    function getFiveDayForecastForCity(city) {
+        currentSearchCityData = null;
+        $forecastLoadingSpinner.show();
+        $forecastErrorMessage.hide().text('');
+        $forecastCardsContainer.empty();
+        $forecastCityName.hide();
+        $addFavoriteBtn.hide();
+
+        const requestUrl = `${forecastApiUrlBase}?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric&lang=tr`;
 
         $.ajax({
-            url: requestUrl,
-            method: 'GET',
+            url: requestUrl, method: 'GET',
             success: function(data) {
-                console.log(`Veri alındı (${city}):`, data);
-                // Temel veri kontrolü
-                if (!data || !data.weather || data.weather.length === 0 || !data.main || !data.name) {
-                    throw new Error('API yanıtı eksik veya hatalı.'); // Hata bloğuna yönlendir
+                if (!data || !data.list || data.list.length === 0 || !data.city) {
+                    throw new Error('API yanıtı eksik veya hatalı.');
                 }
-
-                // Gerekli verileri çek
-                const cityName = data.name;
-                const temperature = data.main.temp;
-                const description = data.weather[0].description;
-                const mainWeather = data.weather[0].main; // 'Clear', 'Clouds', 'Rain' etc.
-                const iconCode = data.weather[0].icon;
-                const tempMin = data.main.temp_min;
-                const tempMax = data.main.temp_max;
-
-                const formattedDesc = description.charAt(0).toUpperCase() + description.slice(1);
-
-                // --- Veriyi ilgili yere bas ---
-                if (isSearchResult) {
-                    // Arama sonuç kutusunu doldur
-                    $contentContainer.find('.sehir-adi').text(cityName);
-                    $contentContainer.find('.anlik-sicaklik').text(Math.round(temperature) + '°');
-                    $contentContainer.find('.aciklama').text(formattedDesc);
-                    $contentContainer.find('.dusuk-sic').text(Math.round(tempMin));
-                    $contentContainer.find('.yuksek-sic').text(Math.round(tempMax));
-
-                    // Arka Planı Ayarla (Sadece Arama Sonucu İçin)
-                    setArkaPlanForResultBox(mainWeather, $target); // $target = #weather-result
-
-                    // Favorilere Ekle Butonunu Kontrol Et
-                    const isAlreadyFavorite = favoriteCities.some(favCity => favCity.toLowerCase() === cityName.toLowerCase());
-                    const isLimitReached = favoriteCities.length >= MAX_FAVORITES;
-                    if (!isAlreadyFavorite && !isLimitReached) {
-                        $addFavoriteBtn.removeClass('d-none'); // Eklenebilirse göster
-                    } else {
-                         $addFavoriteBtn.addClass('d-none'); // Eklenemezse gizle
-                    }
-                    $contentContainer.show(); // İçeriği göster
-
-                } else if (isFavoriteCard) {
-                    // Favori kartını doldur
-                    const iconUrl = `https://openweathermap.org/img/w/${iconCode}.png`;
-
-                    // Favori kartının içeriğini oluştur (YORUM SATIRI KALDIRILDI)
-                    const cardBodyContent = `
-                        <div class="weather-info-loaded"> 
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="card-title mb-0">${cityName}</h5>
-                                <p class="display-6 mb-0 ms-2">${Math.round(temperature)}°</p>
-                            </div>
-                            <div class="weather-info-bottom d-flex align-items-center">
-                                <div class="weather-icon">
-                                    <img src="${iconUrl}" alt="${formattedDesc}" width="35" height="35">
-                                </div>
-                                <div class="weather-text-details ms-2">
-                                    <p class="card-text weather-description mb-0">${formattedDesc}</p>
-                                    <p class="boot-suggestion text-info mt-1 mb-0" style="display: none;"></p> 
-                                </div>
-                            </div>
-                            <button class="btn btn-danger btn-sm mt-2 remove-favorite">Sil</button>
-                       </div> 
-                    `;
-                    // Önceki içeriği temizle ve yenisini ekle
-                    $contentContainer.find('.weather-info-loaded').remove();
-                    $contentContainer.append(cardBodyContent);
-
-                    // ***** Favori kartı için de arka planı ayarla *****
-                    setArkaPlanForResultBox(mainWeather, $target); // $target favori kart elementidir
-
-                    // Bot önerisini kontrol et ve göster/gizle
-                    const rainyKeywords = ['yağmur', 'çiseleyen', 'sağanak', 'fırtına', 'gök gürültülü'];
-                    const isRainy = mainWeather === 'Rain' || mainWeather === 'Drizzle' || mainWeather === 'Thunderstorm' ||
-                                     rainyKeywords.some(keyword => description.toLowerCase().includes(keyword));
-                    if (isRainy) {
-                        $target.find('.boot-suggestion').text('Bot giymeniz önerilir 👢').show();
-                    } else {
-                        $target.find('.boot-suggestion').hide();
-                    }
-                }
-
-                $target.addClass('loaded'); // Yüklendi sınıfını ekle (CSS ile spinner gizlenebilir)
-
+                const cityName = data.city.name;
+                currentSearchCityData = { name: cityName, forecast: data.list };
+                const dailyForecasts = processForecastData(data.list);
+                displayFiveDayForecast(dailyForecasts, cityName);
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                console.error(`API Hatası (${city}):`, textStatus, errorThrown, jqXHR);
-                // Kullanıcı dostu hata mesajı oluştur
+                console.error(`5 Günlük API Hatası (${city}):`, textStatus, errorThrown, jqXHR);
                 let errorMessageTxt = 'Bilgi alınamadı.';
                 if (jqXHR.status === 404) errorMessageTxt = 'Şehir bulunamadı.';
                 else if (jqXHR.status === 401) errorMessageTxt = 'API Anahtarı geçersiz.';
                 else if (jqXHR.status === 0) errorMessageTxt = 'Ağ bağlantısı kurulamadı.';
                 else errorMessageTxt = `Hata: ${jqXHR.statusText || textStatus}`;
-
-                $errorMsg.text(errorMessageTxt).show(); // Hata mesajını göster
-                $target.addClass('error'); // Hata sınıfını ekle
-
-                // Arama kutusunda veya favori kartında hata varsa arka planı 'hata' durumuna getir
-                 if (isSearchResult) {
-                    setArkaPlanForResultBox('hata', $target); // $target is #weather-result
-                    currentSearchCity = null; // Hata varsa aranan şehri sıfırla
-                } else if (isFavoriteCard) {
-                    setArkaPlanForResultBox('hata', $target); // $target is the favorite card element
-                }
+                $forecastErrorMessage.text(errorMessageTxt).show();
+                currentSearchCityData = null;
             },
             complete: function() {
-                $loading.hide(); // Her durumda yükleniyor animasyonunu gizle
-                if (isSearchResult) {
-                    $getWeatherBtn.prop('disabled', false).text('Getir'); // Arama butonunu tekrar aktif et
-                }
+                $forecastLoadingSpinner.hide();
+                $getWeatherBtn.prop('disabled', false).text('Getir');
             }
         });
-    } // --- getWeatherForCity Sonu ---
+    }
 
+    function getWeatherForFavoriteCity(city, $targetCard) {
+        const $loading = $targetCard.find('.loading-spinner');
+        const $errorMsg = $targetCard.find('.error-message');
+        const $cardBody = $targetCard.find('.card-body');
 
-    // --- Arka Plan Ayarlama Fonksiyonu (Hem arama hem favori için) ---
-    function setArkaPlanForResultBox(mainWeather, $targetBox) {
-        // Gelen mainWeather null veya undefined ise 'diger' kabul et
-        const durum = (mainWeather || 'other').toLowerCase();
+        $loading.show();
+        $errorMsg.hide().text('');
+        $targetCard.removeClass('gunesli bulutlu yagmurlu karli diger hata loaded error');
+        $cardBody.find('.weather-info-loaded').remove();
 
-        // Önceki tüm durum sınıflarını temizle
-        $targetBox.removeClass('gunesli bulutlu yagmurlu karli diger hata');
+        const requestUrl = `${currentWeatherApiUrlBase}?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric&lang=tr`;
 
-        let yeniSinif = '';
-        if (durum.includes('clear')) yeniSinif = 'gunesli';
-        else if (durum.includes('clouds')) yeniSinif = 'bulutlu';
-        else if (durum.includes('rain') || durum.includes('drizzle') || durum.includes('thunderstorm')) yeniSinif = 'yagmurlu';
-        else if (durum.includes('snow')) yeniSinif = 'karli';
-        else if (durum === 'hata') yeniSinif = 'hata'; // Explicit hata durumu
-        else yeniSinif = 'diger'; // Diğer tüm durumlar (Mist, Fog, Haze, Dust, Sand, Ash, Squall, Tornado)
+        $.ajax({
+            url: requestUrl, method: 'GET',
+            success: function(data) {
+                if (!data || !data.weather || data.weather.length === 0 || !data.main || !data.name) {
+                    throw new Error('Favori için API yanıtı eksik veya hatalı.');
+                }
+                const cityName = data.name;
+                const temperature = data.main.temp;
+                const description = data.weather[0].description;
+                const iconCode = data.weather[0].icon;
+                const mainWeather = data.weather[0].main.toLowerCase();
 
-        $targetBox.addClass(yeniSinif); // Yeni sınıfı ekle
-        console.log("Arka plan ayarlandı:", $targetBox.attr('id') || $targetBox.data('city'), "->", yeniSinif);
-    } // --- setArkaPlanForResultBox Sonu ---
+                const formattedDesc = description.charAt(0).toUpperCase() + description.slice(1);
+                const iconUrl = `https://openweathermap.org/img/w/${iconCode}.png`;
 
+                const cardBodyContent = `
+                    <div class="weather-info-loaded">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0">${cityName}</h5>
+                            <p class="display-6 mb-0 ms-2">${Math.round(temperature)}°</p>
+                        </div>
+                        <div class="weather-info-bottom d-flex align-items-center">
+                            <div class="weather-icon"> <img src="${iconUrl}" alt="${formattedDesc}"> </div>
+                            <div class="weather-text-details ms-2">
+                                <p class="card-text weather-description mb-0">${formattedDesc}</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-danger btn-sm mt-auto remove-favorite align-self-end">Sil</button>
+                    </div> `;
+                $cardBody.append(cardBodyContent);
+                $targetCard.addClass('loaded');
+                setCardBackground($targetCard, mainWeather);
+            },
+            error: function() {
+                $errorMsg.text('Veri alınamadı').show();
+                $targetCard.addClass('error');
+                setCardBackground($targetCard, 'hata');
+            },
+            complete: function() { $loading.hide(); }
+        });
+    }
 
-    // --- Favori Şehirleri Yükle ve Göster ---
+    function setCardBackground($card, weatherMain) {
+        $card.removeClass('gunesli bulutlu yagmurlu karli diger hata');
+        let newClass = 'diger';
+        if (weatherMain.includes('clear')) newClass = 'gunesli';
+        else if (weatherMain.includes('clouds')) newClass = 'bulutlu';
+        else if (weatherMain.includes('rain') || weatherMain.includes('drizzle') || weatherMain.includes('thunderstorm')) newClass = 'yagmurlu';
+        else if (weatherMain.includes('snow')) newClass = 'karli';
+        else if (weatherMain === 'hata') newClass = 'hata';
+        $card.addClass(newClass);
+    }
+
     function renderFavoriteCities() {
-        $favoriteCitiesContainer.empty(); // Önceki kartları temizle
+        $favoriteCitiesContainer.empty();
         if (favoriteCities.length === 0) {
             $favoriteCitiesContainer.html('<p class="placeholder-message col-12 text-center">Henüz favori şehir eklenmemiş.</p>');
         } else {
             favoriteCities.forEach(city => {
-                // Her şehir için kart HTML'ini oluştur (Başlangıçta sadece yükleniyor spinner'ı var)
                 const cardHtml = `
                     <div class="col">
-                        <div class="card h-100 weather-card" data-city="${city}"> ,
-                            <div class="card-body">,
-                                <div class="loading-spinner" style="display: block;"></div> ,
-                                <p class="error-message" style="display: none;"></p>,
-                                ,
+                        <div class="card h-100 weather-card favorite-weather-card" data-city="${city}">
+                            <div class="card-body d-flex flex-column">
+                                <div class="loading-spinner" style="display: block; margin: auto;"></div>
+                                <p class="error-message text-danger text-center" style="display: none; margin:auto;"></p>
                             </div>
                         </div>
-                    </div>
-                `;
-                const $newCardCol = $(cardHtml); // jQuery nesnesine çevir
-                $favoriteCitiesContainer.append($newCardCol); // Konteynere ekle
-
-                // Kart eklendikten hemen sonra o şehir için hava durumunu çek
-                // Hedef olarak yeni oluşturulan kartın içindeki .weather-card'ı ver
-                getWeatherForCity(city, $newCardCol.find('.weather-card'));
+                    </div> `;
+                const $newCardCol = $(cardHtml);
+                $favoriteCitiesContainer.append($newCardCol);
+                getWeatherForFavoriteCity(city, $newCardCol.find('.weather-card'));
             });
         }
-    } // --- renderFavoriteCities Sonu ---
+    }
 
-    // --- Olay Dinleyicileri ---
-
-    // Sayfa ilk yüklendiğinde favorileri render et
     renderFavoriteCities();
 
-    // Arama Butonu Tıklama Olayı
     $getWeatherBtn.on('click', function() {
-        const city = $cityInput.val().trim(); // Input değerini al ve boşlukları temizle
+        const city = $cityInput.val().trim();
         if (city) {
-            $(this).prop('disabled', true).text('Aranıyor...'); // Butonu geçici olarak pasif yap
-            $searchResultBox.removeClass('d-none'); // Sonuç kutusunu görünür yap (varsa)
-            getWeatherForCity(city, $searchResultBox); // Arama sonucu için hava durumunu çek
+            $(this).prop('disabled', true).text('Aranıyor...');
+            getFiveDayForecastForCity(city);
         } else {
-            // Hata mesajını arama kutusunda gösterelim
-             $searchResultBox.removeClass('d-none');
-             $searchLoadingSpinner.hide();
-             $searchWeatherContent.hide();
-             $searchErrorMessage.text('Lütfen bir şehir adı girin.').show();
-             setArkaPlanForResultBox('hata', $searchResultBox); // Hata arka planı
-             currentSearchCity = null;
+            $forecastErrorMessage.text('Lütfen bir şehir adı girin.').show();
+            $forecastCardsContainer.empty(); $forecastCityName.hide();
+            $forecastLoadingSpinner.hide(); currentSearchCityData = null;
         }
     });
 
-    // Input Alanında Enter Tuşu ile Arama
     $cityInput.keypress(function(event) {
-        if (event.which === 13) { // Enter tuşunun kodu 13'tür
-            event.preventDefault(); // Formun gönderilmesini engelle (varsa)
-            $getWeatherBtn.click(); // Arama butonunun tıklanma olayını tetikle
-        }
+        if (event.which === 13) { event.preventDefault(); $getWeatherBtn.click(); }
     });
 
-    // Favorilere Ekle Butonu Tıklama Olayı
-    $addFavoriteBtn.on('click', function() {
-        // `currentSearchCity` değişkeni arama başarılı olduğunda set edilmiş olmalı
-        const cityToAdd = currentSearchCity;
-        if (!cityToAdd) {
-            console.warn("Favoriye eklenecek geçerli bir şehir bulunamadı (currentSearchCity boş).");
-            alert("Favoriye eklemek için önce geçerli bir şehir arayın.");
-            return;
+    $forecastResultContainer.on('click', '.btn-success', function() {
+        if (!currentSearchCityData || !currentSearchCityData.name) {
+            alert("Favoriye eklemek için önce geçerli bir şehir arayın."); return;
         }
-
-        // Aynı şehir zaten var mı diye kontrol et (küçük/büyük harf duyarsız)
+        const cityToAdd = currentSearchCityData.name;
         const isAlreadyFavorite = favoriteCities.some(favCity => favCity.toLowerCase() === cityToAdd.toLowerCase());
         const isLimitReached = favoriteCities.length >= MAX_FAVORITES;
 
         if (isAlreadyFavorite) {
             alert(`"${cityToAdd}" zaten favorilerinizde!`);
+            $(this).text('Zaten Favorilerde').addClass('disabled');
         } else if (isLimitReached) {
-            alert(`En fazla ${MAX_FAVORITES} favori şehir ekleyebilirsiniz.`);
+            alert(`En fazla ${MAX_FAVORITES} favori şehir ekleyebilirsiniz.`); $(this).hide();
         } else {
-            favoriteCities.push(cityToAdd); // Listeye ekle
-            localStorage.setItem('favoriteCities', JSON.stringify(favoriteCities)); // localStorage'a kaydet
-            renderFavoriteCities(); // Favori listesini güncelleyerek yeniden çiz
+            favoriteCities.push(cityToAdd);
+            localStorage.setItem('favoriteCities', JSON.stringify(favoriteCities));
+            renderFavoriteCities();
             alert(`"${cityToAdd}" favorilerinize eklendi!`);
-            $(this).addClass('d-none'); // Eklendikten sonra butonu gizle
+            $(this).text('Favorilere Eklendi').addClass('disabled');
         }
     });
 
-    // Favori Kaldırma (Event Delegation kullanarak dinamik eklenen butonlar için)
     $favoriteCitiesContainer.on('click', '.remove-favorite', function() {
-        const $card = $(this).closest('.weather-card'); // En yakın .weather-card'ı bul
-        const cityToRemove = $card.data('city'); // data-city attribute'undan şehir adını al
-
-        // Favori listesinden şehri filtrele (küçük/büyük harf duyarsız)
+        const $card = $(this).closest('.weather-card');
+        const cityToRemove = $card.data('city');
         favoriteCities = favoriteCities.filter(city => city.toLowerCase() !== cityToRemove.toLowerCase());
-        localStorage.setItem('favoriteCities', JSON.stringify(favoriteCities)); // localStorage'ı güncelle
-
-        // Kartı animasyonlu olarak kaldır
+        localStorage.setItem('favoriteCities', JSON.stringify(favoriteCities));
         $card.closest('.col').fadeOut(300, function() {
-            $(this).remove(); // Animasyon bitince DOM'dan kaldır
-            // Eğer favori kalmazsa placeholder mesajını göster
+            $(this).remove();
             if (favoriteCities.length === 0) {
-                 $favoriteCitiesContainer.html('<p class="placeholder-message col-12 text-center">Henüz favori şehir eklenmemiş.</p>');
+                $favoriteCitiesContainer.html('<p class="placeholder-message col-12 text-center">Henüz favori şehir eklenmemiş.</p>');
             }
         });
-
-        // Eğer silinen şehir o an arama sonucunda gösteriliyorsa,
-        // ve limit aşılmadıysa, Favorilere Ekle butonunu tekrar görünür yap
-        if (currentSearchCity && currentSearchCity.toLowerCase() === cityToRemove.toLowerCase()) {
-            const isLimitReached = favoriteCities.length >= MAX_FAVORITES;
-             // Arama kutusunda hata olmaması durumunu da kontrol edelim
-            if (!isLimitReached && !$searchResultBox.hasClass('error')) {
-                $addFavoriteBtn.removeClass('d-none');
+        if (currentSearchCityData && currentSearchCityData.name && currentSearchCityData.name.toLowerCase() === cityToRemove.toLowerCase()) {
+            const isLimitReachedAfterRemove = favoriteCities.length >= MAX_FAVORITES;
+            if (!isLimitReachedAfterRemove) {
+                const $dynamicAddBtn = $forecastResultContainer.find('.btn-success');
+                if ($dynamicAddBtn.length > 0) {
+                    $dynamicAddBtn.text(`${currentSearchCityData.name}'i Favorilere Ekle`).removeClass('disabled').show();
+                }
             }
         }
     });
 
 } // --- initializeWeatherApp Sonu ---
+
+// jQuery hazır olduğunda uygulamayı başlat
+$(document).ready(initializeWeatherApp);
