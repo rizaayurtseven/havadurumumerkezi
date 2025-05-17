@@ -1,0 +1,414 @@
+/* CSS Değişkenleri Temalar İçin */
+:root {
+    --light-bg: #f8f9fa;
+    --light-text: #212529;
+    --light-header-footer-bg: #ffffff; /* Header/Footer beyaz */
+    --light-card-bg: #ffffff;
+    --light-card-border: #dee2e6;
+    --light-input-bg: #ffffff;
+    --light-input-text: #495057;
+    --light-shadow: rgba(0, 0, 0, 0.08);
+    --light-info-text: #0d6efd;
+
+   /* Koyu Tema */
+   --dark-bg: #212529; /* Daha koyu ana arka plan */
+   --dark-text: #f8f9fa;
+   --dark-header-footer-bg: #343a40; /* Header/Footer koyu gri */
+   --dark-card-bg: #343a40; /* Kartlar da header gibi */
+   --dark-card-border: #495057; /* Biraz daha belirgin border */
+   --dark-input-bg: #495057;
+   --dark-input-text: #f8f9fa;
+   --dark-shadow: rgba(0, 0, 0, 0.4);
+   --dark-info-text: #6ea8fe;
+
+   /* Fenerbahçe Tema */
+    /* Veya temanızın tanımlandığı başka bir seçici */
+    --fenerbahce-bg: #ff3ff9; /* Çok açık pembe (LavenderBlush) */
+    --fenerbahce-text: #ff2f74; /* Soluk Menekşe Kırmızısı (PaleVioletRed) - koyu pembe tonu */
+    --fenerbahce-header-footer-bg: #FFB6C1; /* Açık Pembe (LightPink) */
+    --fenerbahce-card-bg: #ff006a; /* Daha açık özel bir pembe tonu */
+    --fenerbahce-card-border: #FF69B4; /* Canlı Pembe (HotPink) */
+    --fenerbahce-input-bg: #FFF5FA; /* Çok açık pembe/lavanta */
+    --fenerbahce-input-text: #C71585; /* Orta Menekşe Kırmızısı (MediumVioletRed) - daha koyu pembe */
+    --fenerbahce-shadow: rgba(255, 105, 180, 0.4); /* Canlı Pembe (HotPink) tabanlı gölge */
+    --fenerbahce-info-text: #ff0f0f; /* Açık Mercan (LightCoral) - pembe/kırmızımsı ton */
+  
+}
+
+/* Genel Stiller */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* Body tema sınıfları */
+body.light-theme { background-color: var(--light-bg); color: var(--light-text); }
+body.dark-theme { background-color: var(--dark-bg); color: var(--dark-text); }
+body.fenerbahce-theme { background-color: var(--fenerbahce-bg); color: var(--fenerbahce-text); }
+
+/* Header ve Footer tema renkleri */
+body.light-theme header, body.light-theme footer { background-color: var(--light-header-footer-bg) !important; color: var(--light-text) !important; border-color: var(--light-card-border) !important; }
+body.dark-theme header, body.dark-theme footer { background-color: var(--dark-header-footer-bg) !important; color: var(--dark-text) !important; border-color: var(--dark-card-border) !important; }
+body.fenerbahce-theme header, body.fenerbahce-theme footer { background-color: var(--fenerbahce-header-footer-bg) !important; color: var(--fenerbahce-text) !important; border-color: var(--fenerbahce-card-border) !important; }
+
+/* Genel Kart Stilleri (Arama ve Favori Kartları İçin Temel) */
+.card { /* Bu genel stil özellikle arama kartı için geçerli olacak */
+    border: 1px solid var(--light-card-border);
+    background-color: var(--light-card-bg);
+    box-shadow: 0 2px 5px var(--light-shadow);
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+    border-radius: 8px;
+}
+body.dark-theme .search-card.card { background-color: var(--dark-card-bg); border-color: var(--dark-card-border); color: var(--dark-text); box-shadow: 0 4px 8px var(--dark-shadow); }
+body.fenerbahce-theme .search-card.card { background-color: var(--fenerbahce-card-bg); border-color: var(--fenerbahce-card-border); color: var(--fenerbahce-text); box-shadow: 0 4px 8px var(--fenerbahce-shadow); }
+
+/* Input ve Buton Tema Renkleri */
+body.light-theme .form-control { background-color: var(--light-input-bg); color: var(--light-input-text); border-color: var(--light-card-border); }
+body.dark-theme .form-control { background-color: var(--dark-input-bg); color: var(--dark-input-text); border-color: var(--dark-card-border); }
+body.fenerbahce-theme .form-control { background-color: var(--fenerbahce-input-bg); color: var(--fenerbahce-input-text); border-color: var(--fenerbahce-card-border); }
+body.fenerbahce-theme .form-control::placeholder { color: rgba(255, 0, 255, 0.7); opacity: 1; }
+
+/* Tema Değiştirme Butonu */
+body.dark-theme .btn-outline-secondary { color: var(--dark-text); border-color: var(--dark-card-border); }
+body.dark-theme .btn-outline-secondary:hover { background-color: var(--dark-card-border); color: var(--dark-text); }
+body.fenerbahce-theme .btn-outline-secondary { color: var(--fenerbahce-text); border-color: var(--fenerbahce-card-border); }
+body.fenerbahce-theme .btn-outline-secondary:hover { background-color: var(--fenerbahce-card-border); color: var(--fenerbahce-bg); }
+
+/* Birincil Buton (Getir) */
+body.dark-theme .btn-primary { background-color: #0d6efd; border-color: #0d6efd; }
+body.dark-theme .btn-primary:hover { background-color: #0b5ed7; border-color: #0a58ca; }
+body.fenerbahce-theme .btn-primary { background-color: var(--fenerbahce-card-border); border-color: var(--fenerbahce-card-border); color: var(--fenerbahce-bg); }
+body.fenerbahce-theme .btn-primary:hover { background-color: #cc00cc; border-color: #cc00cc; color: var(--fenerbahce-bg); }
+
+/* ====================================================== */
+/* <<< ARAMA SONUCU KARTI STİLLERİ (BİZİM TASARIM) >>> */
+/* ====================================================== */
+.weather-result-box {
+    /* Temel Kutu Stilleri */
+    width: 100%; /* Konteynerin tamamını kapla */
+    padding: 20px 25px;
+    border-radius: 15px; /* Oval görünüm */
+    color: white; /* Yazı rengi her zaman beyaz */
+    background-color: rgba(40, 40, 40, 0.75); /* Varsayılan yarı şeffaf koyu */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    box-sizing: border-box;
+    min-height: 170px; /* Minimum yükseklik */
+    position: relative; /* Spinner ve içerik konumlandırma için */
+    overflow: hidden; /* Köşelerden taşmayı engelle */
+
+    /* Arka Plan Geçişleri */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: background-image 0.8s ease-in-out, background-color 0.8s ease-in-out;
+}
+
+/* İçerik ve Placeholder/Spinner Yönetimi (Arama Sonucu) */
+.weather-result-box .loading-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+.weather-result-box .error-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+}
+/* Tema renkleri için hata mesajı (Arama Sonucu) */
+body.light-theme .weather-result-box .error-message { color: #dc3545; background-color: rgba(220, 53, 69, 0.1);}
+body.dark-theme .weather-result-box .error-message { color: #f8d7da; background-color: rgba(248, 215, 218, 0.1); }
+body.fenerbahce-theme .weather-result-box .error-message { color: #ffb3ff; background-color: rgba(255, 0, 255, 0.1); }
+
+
+.weather-result-box .weather-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* Sonuçlar içindeki satırlar (Arama Sonucu) */
+.weather-result-box .sonuc-satir {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+}
+.weather-result-box .sonuc-satir:last-child { margin-bottom: 0; }
+
+/* İçerik stilleri (Arama Sonucu) */
+.weather-result-box .sehir-adi { font-size: 1.8em; font-weight: 500; margin: 0; }
+.weather-result-box .anlik-sicaklik { font-size: 3.8em; font-weight: 300; margin: 0; line-height: 1; }
+.weather-result-box .aciklama { font-size: 1em; font-weight: 400; margin: 0; color: rgba(255, 255, 255, 0.9); }
+.weather-result-box .dy-sicaklik { font-size: 1em; font-weight: 500; margin: 0; white-space: nowrap; color: rgba(255, 255, 255, 0.9); }
+.weather-result-box .dy-sicaklik span { margin-left: 5px; }
+.weather-result-box .dy-sicaklik span.dusuk-sic,
+.weather-result-box .dy-sicaklik span.yuksek-sic { margin-left: 2px; } /* Derece ile sayı arasına küçük boşluk */
+
+/* Favorilere Ekle Butonu (Arama Sonucu) */
+.weather-result-box .add-favorite-btn {
+     padding: 0.3rem 0.6rem;
+     font-size: 0.85rem;
+     /* Fenerbahçe teması için özel renk */
+     body.fenerbahce-theme & {
+        background-color: var(--fenerbahce-card-border);
+        border-color: var(--fenerbahce-card-border);
+        color: var(--fenerbahce-bg);
+     }
+     body.fenerbahce-theme &:hover {
+        background-color: #cc00cc;
+        border-color: #cc00cc;
+     }
+}
+
+/* Arka Plan Sınıfları (#weather-result İçin) */
+.weather-result-box.gunesli { background-image: url('gunesli.jpg'); }
+.weather-result-box.bulutlu { background-image: url('bulutlu.jpg'); }
+.weather-result-box.yagmurlu { background-image: url('yagmurlu.jpg'); }
+.weather-result-box.karli { background-image: url('karli.jpg'); }
+.weather-result-box.diger { background-color: #5a6a7b; background-image: none; }
+.weather-result-box.hata { background-color: #8b3a4a; background-image: none; }
+
+
+/* ====================================================== */
+/* <<< FAVORİ KONUMLAR KARTI STİLLERİ >>> */
+/* ====================================================== */
+
+#saved-locations .card { /* Favori kartlar için temel stil */
+    min-height: 160px; /* Minimum yükseklik */
+    position: relative;
+    /* Arka plan geçişleri ve ayarları */
+    transition: background-image 0.8s ease-in-out, background-color 0.8s ease-in-out, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden; /* İçeriğin köşelerden taşmasını engelle */
+    border-radius: 8px; /* Köşe yuvarlaklığı */
+    box-shadow: 0 2px 5px var(--light-shadow); /* Varsayılan gölge */
+}
+/* Tema Gölgeleri (Favoriler) */
+body.dark-theme #saved-locations .card { box-shadow: 0 4px 8px var(--dark-shadow); }
+body.fenerbahce-theme #saved-locations .card { box-shadow: 0 4px 8px var(--fenerbahce-shadow); }
+
+
+/* Favori kartları için arka plan sınıfları */
+#saved-locations .weather-card.gunesli { background-image: url('gunesli.jpg'); }
+#saved-locations .weather-card.bulutlu { background-image: url('bulutlu.jpg'); }
+#saved-locations .weather-card.yagmurlu { background-image: url('yagmurlu.jpg'); }
+#saved-locations .weather-card.karli { background-image: url('karli.jpg'); }
+#saved-locations .weather-card.diger { background-color: #5a6a7b; background-image: none; }
+#saved-locations .weather-card.hata { background-color: #8b3a4a; background-image: none; }
+
+
+/* Arka plan üzerinde metin okunabilirliği (Favoriler) */
+#saved-locations .weather-card.gunesli,
+#saved-locations .weather-card.bulutlu,
+#saved-locations .weather-card.yagmurlu,
+#saved-locations .weather-card.karli,
+#saved-locations .weather-card.diger,
+#saved-locations .weather-card.hata {
+    color: white !important; /* Yazı rengini beyaz yap */
+    border-color: transparent !important; /* Arka plan varken border'ı gizle */
+}
+
+/* İç elemanların da okunabilir olması (Favoriler) */
+#saved-locations .weather-card.gunesli .card-title,
+#saved-locations .weather-card.bulutlu .card-title,
+#saved-locations .weather-card.yagmurlu .card-title,
+#saved-locations .weather-card.karli .card-title,
+#saved-locations .weather-card.diger .card-title,
+#saved-locations .weather-card.hata .card-title,
+#saved-locations .weather-card.gunesli .display-6,
+#saved-locations .weather-card.bulutlu .display-6,
+#saved-locations .weather-card.yagmurlu .display-6,
+#saved-locations .weather-card.karli .display-6,
+#saved-locations .weather-card.diger .display-6,
+#saved-locations .weather-card.hata .display-6,
+#saved-locations .weather-card.gunesli .weather-description,
+#saved-locations .weather-card.bulutlu .weather-description,
+#saved-locations .weather-card.yagmurlu .weather-description,
+#saved-locations .weather-card.karli .weather-description,
+#saved-locations .weather-card.diger .weather-description,
+#saved-locations .weather-card.hata .weather-description {
+    color: white !important; /* İç elemanların yazı rengi */
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6); /* Okunabilirlik için gölge */
+}
+
+/* Bot önerisi rengini ayarla (Favoriler) */
+#saved-locations .weather-card.gunesli .boot-suggestion,
+#saved-locations .weather-card.bulutlu .boot-suggestion,
+#saved-locations .weather-card.yagmurlu .boot-suggestion,
+#saved-locations .weather-card.karli .boot-suggestion,
+#saved-locations .weather-card.diger .boot-suggestion,
+#saved-locations .weather-card.hata .boot-suggestion {
+    color: rgba(255, 255, 255, 0.9) !important; /* Açık renk */
+    font-weight: 500;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6); /* Okunabilirlik için gölge */
+}
+
+/* Sil butonunu ayarla (Favoriler) */
+#saved-locations .weather-card.gunesli .remove-favorite,
+#saved-locations .weather-card.bulutlu .remove-favorite,
+#saved-locations .weather-card.yagmurlu .remove-favorite,
+#saved-locations .weather-card.karli .remove-favorite,
+#saved-locations .weather-card.diger .remove-favorite,
+#saved-locations .weather-card.hata .remove-favorite {
+   background-color: rgba(255, 255, 255, 0.2);
+   border: 1px solid rgba(255, 255, 255, 0.4);
+   color: white;
+}
+#saved-locations .weather-card.gunesli .remove-favorite:hover,
+#saved-locations .weather-card.bulutlu .remove-favorite:hover,
+#saved-locations .weather-card.yagmurlu .remove-favorite:hover,
+#saved-locations .weather-card.karli .remove-favorite:hover,
+#saved-locations .weather-card.diger .remove-favorite:hover,
+#saved-locations .weather-card.hata .remove-favorite:hover {
+   background-color: rgba(255, 255, 255, 0.4);
+   border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* Favori kart gövdesi (Overlay ve İçerik Yönetimi) */
+#saved-locations .card .card-body {
+    position: relative; /* İçerik konumlandırma için */
+    padding: 1rem;
+    /* Okunabilirlik için hafif overlay */
+    background-color: rgba(0, 0, 0, 0.25); /* Opaklığı ayarlayabilirsiniz */
+    border-radius: inherit; /* Ana kartın köşe yuvarlaklığını alsın */
+    z-index: 1; /* Overlay'in arka planın üstünde olmasını sağla */
+    height: 100%; /* Kartın tamamını kapla */
+    display: flex; /* İçeriği yönetmek için */
+    flex-direction: column; /* İçeriği dikey sırala */
+    justify-content: space-between; /* İçeriği dikeyde dağıt */
+}
+
+
+/* Yükleme ve Hata Durumları Yönetimi (Favoriler) */
+#saved-locations .loading-spinner {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3; /* İçerik ve overlay'in üzerinde */
+}
+#saved-locations .weather-card.loaded .loading-spinner,
+#saved-locations .weather-card.error .loading-spinner { display: none !important; }
+
+#saved-locations .error-message {
+    position: absolute; /* Mutlak konumlandırma */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.9rem;
+    text-align: center;
+    width: 80%; /* Genişliği sınırla */
+    padding: 10px;
+    background-color: rgba(220, 53, 69, 0.8); /* Daha belirgin hata arka planı */
+    color: white !important; /* Hata metni rengi beyaz */
+    border-radius: 5px;
+    z-index: 3; /* İçerik ve overlay'in üzerinde */
+    display: none; /* Başlangıçta gizli */
+}
+#saved-locations .weather-card.error .error-message { display: block !important; }
+
+
+/* Hata durumunda diğer elementleri gizle (Favoriler) */
+#saved-locations .weather-card.error .weather-info-loaded,
+#saved-locations .weather-card.error .remove-favorite {
+    display: none !important;
+}
+
+/* Favori kart içeriği - Ana sarmalayıcı */
+#saved-locations .weather-info-loaded {
+    flex-grow: 1; /* Boş alanı doldur */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Başlık/sıcaklık ve alt bilgiyi ayır */
+    z-index: 2; /* Overlay'in üzerinde */
+    position: relative; /* İç pozisyonlama için */
+}
+
+/* Favori kart içeriği stilleri */
+#saved-locations .card-title { font-weight: bold; font-size: 1.2rem; margin-bottom: 0.5rem; z-index: 2;}
+#saved-locations .display-6 { font-size: 2rem; font-weight: normal; margin-bottom: 0.5rem; z-index: 2;}
+#saved-locations .weather-info-bottom { display: flex; align-items: center; font-size: 0.9rem; z-index: 2;}
+#saved-locations .weather-icon { margin-right: 0.5rem; z-index: 2;}
+#saved-locations .weather-icon img { width: 35px; height: 35px; filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.7)); } /* İkon gölgesi */
+#saved-locations .weather-text-details { z-index: 2; flex-grow: 1; } /* Açıklama alanının genişlemesini sağla */
+#saved-locations .weather-description { margin: 0; }
+#saved-locations .boot-suggestion { font-size: 0.85rem; margin-top: 0.2rem; }
+
+/* Sil Butonu (Favoriler) */
+#saved-locations .remove-favorite {
+    align-self: flex-end; /* Sağa yasla */
+    margin-top: 0.5rem; /* Üst boşluk */
+    padding: 0.2rem 0.5rem;
+    font-size: 0.8rem;
+    z-index: 2; /* Overlay'in üzerinde */
+}
+/* Fenerbahçe tema sil butonu rengi (İsteğe bağlı) */
+body.fenerbahce-theme #saved-locations .weather-card:not(.gunesli):not(.bulutlu):not(.yagmurlu):not(.karli):not(.diger):not(.hata) .btn-danger { background-color: #bb2d3b; border-color: #bb2d3b; }
+body.fenerbahce-theme #saved-locations .weather-card:not(.gunesli):not(.bulutlu):not(.yagmurlu):not(.karli):not(.diger):not(.hata) .btn-danger:hover { background-color: #dc3545; border-color: #dc3545;}
+
+
+/* Bot Önerisi Tema Renkleri (Arka plan olmayan kartlar için) */
+body.light-theme #saved-locations .weather-card:not(.gunesli):not(.bulutlu):not(.yagmurlu):not(.karli):not(.diger):not(.hata) .boot-suggestion { color: var(--light-info-text) !important; }
+body.dark-theme #saved-locations .weather-card:not(.gunesli):not(.bulutlu):not(.yagmurlu):not(.karli):not(.diger):not(.hata) .boot-suggestion { color: var(--dark-info-text) !important; }
+body.fenerbahce-theme #saved-locations .weather-card:not(.gunesli):not(.bulutlu):not(.yagmurlu):not(.karli):not(.diger):not(.hata) .boot-suggestion { color: var(--fenerbahce-info-text) !important; }
+
+/* Loading Spinner Genel */
+.loading-spinner {
+    border: 4px solid rgba(128, 128, 128, 0.2); /* Daha soluk border */
+    border-left-color: var(--light-text); /* Tema rengi */
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    display: none; /* Başlangıçta gizli (JS ile kontrol edilir) */
+}
+/* Tema renkleri spinner */
+body.dark-theme .loading-spinner { border-left-color: var(--dark-text); }
+body.fenerbahce-theme .loading-spinner { border-left-color: var(--fenerbahce-text); }
+/* Arka planlı kartlarda spinner rengi (beyaz) */
+#saved-locations .weather-card.gunesli .loading-spinner,
+#saved-locations .weather-card.bulutlu .loading-spinner,
+#saved-locations .weather-card.yagmurlu .loading-spinner,
+#saved-locations .weather-card.karli .loading-spinner,
+#saved-locations .weather-card.diger .loading-spinner,
+#saved-locations .weather-card.hata .loading-spinner,
+.weather-result-box .loading-spinner {
+    border-left-color: white;
+    border-top-color: rgba(255,255,255,0.2);
+    border-right-color: rgba(255,255,255,0.2);
+    border-bottom-color: rgba(255,255,255,0.2);
+}
+
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Placeholder Mesajı */
+.placeholder-message {
+    color: #6c757d; /* Bootstrap text-muted rengi */
+    font-style: italic;
+}
+body.dark-theme .placeholder-message { color: #adb5bd; }
+body.fenerbahce-theme .placeholder-message { color: var(--fenerbahce-info-text); }
+
+
+/* Responsive */
+@media (max-width: 991.98px) { /* lg breakpoint altı */
+     #saved-locations { margin-top: 2rem; }
+     .weather-result-box .anlik-sicaklik { font-size: 3em; }
+     .weather-result-box .sehir-adi { font-size: 1.5em; }
+}
