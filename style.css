@@ -138,11 +138,6 @@ footer.border-top { /* Footer'ın üst kenarlığı için daha belirgin bir renk
 .forecast-day-card .card-text { /* Genel card-text için de renk */
      color: var(--dark-text) !important;
 }
-
-
-/* ====================================================== */
-/* <<< FAVORİ KONUMLAR KARTI STİLLERİ - Koyu Tema Varsayılan >>> */
-/* ====================================================== */
 #saved-locations .weather-card {
     min-height: 180px;
     position: relative;
@@ -281,9 +276,6 @@ footer.border-top { /* Footer'ın üst kenarlığı için daha belirgin bir renk
     animation: spin 1s linear infinite;
     display: none;
 }
-/* Arka planı renkli olan kartlarda spinner zaten beyaz kalmalı (yukarıdaki genel kuraldan) */
-/* Eğer #forecast-loading-spinner için özel bir durum gerekirse: */
-/* #forecast-loading-spinner { border-left-color: var(--dark-text); } */
 
 @keyframes spin {
     0% { transform: translate(-50%, -50%) rotate(0deg); }
@@ -294,8 +286,6 @@ footer.border-top { /* Footer'ın üst kenarlığı için daha belirgin bir renk
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
-/* .loading-spinner'da (eğer translate(-50%, -50%) kullanılmıyorsa) animation: spin-normal 1s linear infinite; kullanın. */
-/* Mevcut #forecast-loading-spinner için spin-normal daha uygun olabilir: */
 #forecast-loading-spinner { animation-name: spin-normal; transform: none; /* translate'i iptal et */ }
 
 
