@@ -1,9 +1,6 @@
-// Tema ile ilgili tüm kodlar kaldırıldı.
-
-// Hava Durumu Uygulaması İşlevselliği
 function initializeWeatherApp() {
 
-    const apiKey = '5c03ce0373390aff630bcb6f7aac303b'; // <<< KENDİ API ANAHTARINIZI GİRİN!
+    const apiKey = '5c03ce0373390aff630bcb6f7aac303b'; 
     const forecastApiUrlBase = 'https://api.openweathermap.org/data/2.5/forecast';
     const currentWeatherApiUrlBase = 'https://api.openweathermap.org/data/2.5/weather';
 
@@ -291,7 +288,5 @@ function initializeWeatherApp() {
         }
     });
 
-} // --- initializeWeatherApp Sonu ---
-
-// jQuery hazır olduğunda uygulamayı başlat
+} 
 $(document).ready(initializeWeatherApp);
